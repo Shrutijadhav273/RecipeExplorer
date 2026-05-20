@@ -8,27 +8,35 @@ import {
   Alert,
 } from 'react-native';
 
-export default function LoginScreen() {
+export default function SignupScreen() {
 
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleSignup = () => {
 
-    if (!email || !password) {
+    if (!name || !email || !password) {
       Alert.alert('Error', 'Please fill all fields');
       return;
     }
 
-    Alert.alert('Success', 'Login Button Clicked');
+    Alert.alert('Success', 'Signup Button Clicked');
   };
 
   return (
     <View style={styles.container}>
 
       <Text style={styles.title}>
-        Login
+        Register
       </Text>
+
+      <TextInput
+        placeholder="Enter Name"
+        style={styles.input}
+        value={name}
+        onChangeText={setName}
+      />
 
       <TextInput
         placeholder="Enter Email"
@@ -47,10 +55,10 @@ export default function LoginScreen() {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={handleLogin}
+        onPress={handleSignup}
       >
         <Text style={styles.buttonText}>
-          Login
+          Register
         </Text>
       </TouchableOpacity>
 
