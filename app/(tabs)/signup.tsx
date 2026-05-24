@@ -1,11 +1,12 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-  View,
+  Alert,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Alert,
+  View,
 } from 'react-native';
 
 export default function SignupScreen() {
@@ -21,7 +22,7 @@ export default function SignupScreen() {
       return;
     }
 
-    Alert.alert('Success', 'Signup Button Clicked');
+    router.replace('/(tabs)/home');
   };
 
   return (

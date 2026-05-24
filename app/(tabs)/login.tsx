@@ -1,12 +1,14 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-  View,
+  Alert,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Alert,
+  View,
 } from 'react-native';
+
 
 export default function LoginScreen() {
 
@@ -15,13 +17,15 @@ export default function LoginScreen() {
 
   const handleLogin = () => {
 
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill all fields');
-      return;
-    }
+  if (!email || !password) {
+    Alert.alert('Error', 'Please fill all fields');
+    return;
+  }
 
-    Alert.alert('Success', 'Login Button Clicked');
-  };
+  //Alert.alert('Success', 'Login Successful');
+
+  router.replace('/(tabs)/home');
+};
 
   return (
     <View style={styles.container}>
