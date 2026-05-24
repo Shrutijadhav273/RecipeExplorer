@@ -1,14 +1,15 @@
-import { View, Text, StyleSheet , TouchableOpacity } from 'react-native';
-
+import { router } from 'expo-router';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 export default function HomeScreen() {
 
   const handleLogin = () => {
-    console.log('Go to Login Screen');
+    router.push('/login');
   };
 
   const handleRegister = () => {
-    console.log('Go to Register Screen');
+    router.push('/signup');
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>
