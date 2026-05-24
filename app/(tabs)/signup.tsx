@@ -50,9 +50,15 @@ export default function SignupScreen() {
 
       Alert.alert('Success', 'Signup Successful');
 
-    } catch (error) {
-      Alert.alert('Error', 'Signup Failed');
-    }
+    } catch (error: any) {
+
+  console.log(error.response?.data);
+
+  Alert.alert(
+    'Error',
+    error.response?.data?.error || 'Signup Failed'
+  );
+}
   };
 
   return (
