@@ -1,5 +1,4 @@
-import { router } from 'expo-router';
-import { useState } from 'react';
+import React from 'react';
 import {
   Alert,
   StyleSheet,
@@ -9,57 +8,103 @@ import {
   View,
 } from 'react-native';
 
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Controller, useForm } from 'react-hook-form';
+import * as yup from 'yup';
+
+import API from '../../services/api';
+
+const schema = yup.object({
+
+  email: yup
+    .string()
+    .email('Enter valid email')
+    .required('Email is required'),
+
+  password: yup
+    .string()
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
+});
+
 export default function SignupScreen() {
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
-  const handleSignup = () => {
+  const onSignup = async (data: any) => {
 
-    if (!name || !email || !password) {
-      Alert.alert('Error', 'Please fill all fields');
-      return;
+    try {
+
+      const response = await API.post('/register', {
+        email: data.email,
+        password: data.password,
+      });
+
+      console.log(response.data);
+
+      Alert.alert('Success', 'Signup Successful');
+
+    } catch (error) {
+      Alert.alert('Error', 'Signup Failed');
     }
-
-    router.replace('/(tabs)/home');
   };
 
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>
-        Register
-      </Text>
+      <Text style={styles.title}>Signup</Text>
 
-      <TextInput
-        placeholder="Enter Name"
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
+      <Controller
+        control={control}
+        name="email"
+        render={({ field: { onChange, value } }) => (
+          <TextInput
+            placeholder="Enter Email"
+            style={styles.input}
+            value={value}
+            onChangeText={onChange}
+          />
+        )}
       />
 
-      <TextInput
-        placeholder="Enter Email"
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
+      {errors.email && (
+        <Text style={styles.error}>
+          {errors.email.message}
+        </Text>
+      )}
+
+      <Controller
+        control={control}
+        name="password"
+        render={({ field: { onChange, value } }) => (
+          <TextInput
+            placeholder="Enter Password"
+            style={styles.input}
+            secureTextEntry
+            value={value}
+            onChangeText={onChange}
+          />
+        )}
       />
 
-      <TextInput
-        placeholder="Enter Password"
-        style={styles.input}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+      {errors.password && (
+        <Text style={styles.error}>
+          {errors.password.message}
+        </Text>
+      )}
 
       <TouchableOpacity
         style={styles.button}
-        onPress={handleSignup}
+        onPress={handleSubmit(onSignup)}
       >
         <Text style={styles.buttonText}>
-          Register
+          Signup
         </Text>
       </TouchableOpacity>
 
@@ -73,6 +118,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
+    backgroundColor: '#fff',
   },
 
   title: {
@@ -87,13 +133,19 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     padding: 15,
     borderRadius: 10,
-    marginBottom: 15,
+    marginBottom: 10,
+  },
+
+  error: {
+    color: 'red',
+    marginBottom: 10,
   },
 
   button: {
     backgroundColor: 'black',
     padding: 15,
     borderRadius: 10,
+    marginTop: 10,
   },
 
   buttonText: {

@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import React from 'react';
 import {
   Alert,
   StyleSheet,
@@ -9,49 +9,102 @@ import {
   View,
 } from 'react-native';
 
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Controller, useForm } from 'react-hook-form';
+import * as yup from 'yup';
+
+import API from '../../services/api';
+
+const schema = yup.object({
+
+  email: yup
+    .string()
+    .email('Enter valid email')
+    .required('Email is required'),
+
+  password: yup
+    .string()
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
+});
 
 export default function LoginScreen() {
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
-  const handleLogin = () => {
+  const onLogin = async (data: any) => {
 
-  if (!email || !password) {
-    Alert.alert('Error', 'Please fill all fields');
-    return;
-  }
+    try {
 
-  //Alert.alert('Success', 'Login Successful');
+      const response = await API.post('/login', {
+        email: data.email,
+        password: data.password,
+      });
 
-  router.replace('/(tabs)/home');
-};
+      console.log(response.data);
+
+      Alert.alert('Success', 'Login Successful');
+
+      router.replace('/(tabs)');
+
+    } catch (error) {
+      Alert.alert('Error', 'Invalid Credentials');
+    }
+  };
 
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>
-        Login
-      </Text>
+      <Text style={styles.title}>Login</Text>
 
-      <TextInput
-        placeholder="Enter Email"
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
+      <Controller
+        control={control}
+        name="email"
+        render={({ field: { onChange, value } }) => (
+          <TextInput
+            placeholder="Enter Email"
+            style={styles.input}
+            value={value}
+            onChangeText={onChange}
+          />
+        )}
       />
 
-      <TextInput
-        placeholder="Enter Password"
-        style={styles.input}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
+      {errors.email && (
+        <Text style={styles.error}>
+          {errors.email.message}
+        </Text>
+      )}
+
+      <Controller
+        control={control}
+        name="password"
+        render={({ field: { onChange, value } }) => (
+          <TextInput
+            placeholder="Enter Password"
+            style={styles.input}
+            secureTextEntry
+            value={value}
+            onChangeText={onChange}
+          />
+        )}
       />
+
+      {errors.password && (
+        <Text style={styles.error}>
+          {errors.password.message}
+        </Text>
+      )}
 
       <TouchableOpacity
         style={styles.button}
-        onPress={handleLogin}
+        onPress={handleSubmit(onLogin)}
       >
         <Text style={styles.buttonText}>
           Login
@@ -68,6 +121,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
+    backgroundColor: '#fff',
   },
 
   title: {
@@ -82,13 +136,19 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     padding: 15,
     borderRadius: 10,
-    marginBottom: 15,
+    marginBottom: 10,
+  },
+
+  error: {
+    color: 'red',
+    marginBottom: 10,
   },
 
   button: {
     backgroundColor: 'black',
     padding: 15,
     borderRadius: 10,
+    marginTop: 10,
   },
 
   buttonText: {
